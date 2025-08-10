@@ -9,30 +9,37 @@ const router = express.Router();
 const generateState = () => crypto.randomBytes(32).toString('hex');
 
 // Store state temporarily (in production, use Redis or similar)
-const oauthStates = new Map<string, number>();
+const oauthStates = new Map<string, { timestamp: number; credentials: any }>();
 
 // Slack OAuth URLs
 const SLACK_OAUTH_URL = 'https://slack.com/oauth/v2/authorize';
 const SLACK_TOKEN_URL = 'https://slack.com/api/oauth.v2.access';
 
-// Start OAuth flow
-router.get('/slack', (req, res) => {
-  const clientId = process.env.SLACK_CLIENT_ID;
-  const redirectUri = process.env.SLACK_REDIRECT_URI;
+// Start OAuth flow with dynamic credentials
+router.post('/slack', (req, res) => {
+  const { clientId, clientSecret, signingSecret } = req.body;
   
-  if (!clientId || !redirectUri) {
-    return res.status(500).json({ 
-      error: 'Missing Slack OAuth configuration. Please check SLACK_CLIENT_ID and SLACK_REDIRECT_URI environment variables.' 
+  if (!clientId || !clientSecret) {
+    return res.status(400).json({ 
+      error: 'Missing required Slack credentials. Please provide clientId and clientSecret.' 
     });
   }
 
+  // Use environment variable for redirect URI or construct from request
+  const redirectUri = process.env.SLACK_REDIRECT_URI || `${req.protocol}://${req.get('host')}/auth/slack/callback`;
+
   const state = generateState();
-  oauthStates.set(state, Date.now());
+  
+  // Store credentials with state for callback
+  oauthStates.set(state, {
+    timestamp: Date.now(),
+    credentials: { clientId, clientSecret, signingSecret }
+  });
   
   // Clean up old states (older than 10 minutes)
   const tenMinutesAgo = Date.now() - 10 * 60 * 1000;
-  for (const [key, timestamp] of oauthStates.entries()) {
-    if (timestamp < tenMinutesAgo) {
+  for (const [key, data] of oauthStates.entries()) {
+    if (data.timestamp < tenMinutesAgo) {
       oauthStates.delete(key);
     }
   }
@@ -69,20 +76,25 @@ router.get('/slack/callback', async (req, res) => {
     return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}?error=missing_code_or_state`);
   }
 
-  // Verify state parameter
-  if (!oauthStates.has(state as string)) {
+  // Verify state parameter and get credentials
+  const stateData = oauthStates.get(state as string);
+  if (!stateData) {
     return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}?error=invalid_state`);
   }
+  
+  const { credentials } = stateData;
   oauthStates.delete(state as string);
 
   try {
-    // Exchange code for access token
+    // Exchange code for access token using dynamic credentials
+    const redirectUri = process.env.SLACK_REDIRECT_URI || `${req.protocol}://${req.get('host')}/auth/slack/callback`;
+    
     const tokenResponse = await axios.post(SLACK_TOKEN_URL, null, {
       params: {
-        client_id: process.env.SLACK_CLIENT_ID,
-        client_secret: process.env.SLACK_CLIENT_SECRET,
+        client_id: credentials.clientId,
+        client_secret: credentials.clientSecret,
         code: code as string,
-        redirect_uri: process.env.SLACK_REDIRECT_URI
+        redirect_uri: redirectUri
       },
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'

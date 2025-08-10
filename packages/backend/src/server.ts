@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 import { authRoutes } from './routes/auth';
 import { messageRoutes } from './routes/messages';
 import { scheduledRoutes } from './routes/scheduled';
@@ -19,8 +20,14 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Serve static files from the React app in production
+if (process.env.NODE_ENV === 'production') {
+  const frontendBuildPath = path.join(__dirname, '../../frontend/build');
+  app.use(express.static(frontendBuildPath));
+}
+
 // Health check
-app.get('/', (req, res) => {
+app.get('/health', (req, res) => {
   res.json({ message: 'Slack Connect Backend is running!' });
 });
 
@@ -28,6 +35,18 @@ app.get('/', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/scheduled', scheduledRoutes);
+
+// Serve React app for all non-API routes in production
+if (process.env.NODE_ENV === 'production') {
+  app.get('*', (req, res) => {
+    const frontendBuildPath = path.join(__dirname, '../../frontend/build');
+    res.sendFile(path.join(frontendBuildPath, 'index.html'));
+  });
+} else {
+  app.get('/', (req, res) => {
+    res.json({ message: 'Slack Connect Backend is running!' });
+  });
+}
 
 // Initialize database and start server
 async function startServer() {

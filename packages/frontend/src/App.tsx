@@ -23,24 +23,31 @@ function App() {
     const error = urlParams.get('error');
 
     if (success && userId) {
-      setUser({ id: userId, teamId: '' });
+      const userData = { id: userId, teamId: '' };
+      setUser(userData);
+      localStorage.setItem('slack_user_id', userId);
       toast.success('Successfully connected to Slack!');
       // Clean up URL
       window.history.replaceState({}, document.title, '/');
+      setLoading(false);
+      return; // Exit early to prevent checking saved user ID
     } else if (error) {
       toast.error(`Authentication failed: ${error}`);
       // Clean up URL
       window.history.replaceState({}, document.title, '/');
+      setLoading(false);
+      return;
     }
 
     // Check if user is already authenticated
     const savedUserId = localStorage.getItem('slack_user_id');
-    if (savedUserId && !user) {
+    if (savedUserId) {
       checkAuthStatus(savedUserId);
     } else {
       setLoading(false);
     }
-  }, [user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array to run only once
 
   const checkAuthStatus = async (userId: string) => {
     try {

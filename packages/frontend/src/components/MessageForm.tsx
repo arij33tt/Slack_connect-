@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { api } from '../services/api';
 
@@ -22,11 +22,7 @@ export const MessageForm: React.FC<MessageFormProps> = ({ userId }) => {
   const [loading, setLoading] = useState(false);
   const [channelsLoading, setChannelsLoading] = useState(false);
 
-  useEffect(() => {
-    loadChannels();
-  }, [userId]);
-
-  const loadChannels = async () => {
+  const loadChannels = useCallback(async () => {
     setChannelsLoading(true);
     try {
       const response = await api.get(`/api/messages/channels/${userId}`);
@@ -37,7 +33,11 @@ export const MessageForm: React.FC<MessageFormProps> = ({ userId }) => {
     } finally {
       setChannelsLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    loadChannels();
+  }, [loadChannels]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

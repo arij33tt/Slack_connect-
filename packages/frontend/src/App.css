@@ -81,7 +81,7 @@
   border-radius: 16px;
   padding: 2rem;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  max-width: 400px;
+  max-width: 500px;
   width: 100%;
 }
 
@@ -123,6 +123,63 @@
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+}
+
+/* Credentials Form */
+.credentials-form {
+  text-align: left;
+  margin: 1.5rem 0;
+}
+
+.credentials-form .form-group {
+  margin-bottom: 1.2rem;
+}
+
+.credentials-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.credentials-form input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.credentials-form input:focus {
+  outline: none;
+  border-color: #4A90E2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
+}
+
+.credentials-form input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.credentials-form small {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
 }
 
 /* Dashboard */

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { api } from '../services/api';
 
@@ -22,16 +22,7 @@ export const ScheduledMessages: React.FC<ScheduledMessagesProps> = ({ userId }) 
   const [messages, setMessages] = useState<ScheduledMessage[]>([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    loadScheduledMessages();
-    
-    // Refresh every 30 seconds to show updated statuses
-    const interval = setInterval(loadScheduledMessages, 30000);
-    
-    return () => clearInterval(interval);
-  }, [userId]);
-
-  const loadScheduledMessages = async () => {
+  const loadScheduledMessages = useCallback(async () => {
     setLoading(true);
     try {
       const response = await api.get(`/api/scheduled/list/${userId}`);
@@ -42,7 +33,16 @@ export const ScheduledMessages: React.FC<ScheduledMessagesProps> = ({ userId }) 
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    loadScheduledMessages();
+    
+    // Refresh every 30 seconds to show updated statuses
+    const interval = setInterval(loadScheduledMessages, 30000);
+    
+    return () => clearInterval(interval);
+  }, [loadScheduledMessages]);
 
   const cancelMessage = async (messageId: number) => {
     if (!window.confirm('Are you sure you want to cancel this scheduled message?')) {
