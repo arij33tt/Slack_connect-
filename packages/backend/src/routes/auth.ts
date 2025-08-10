@@ -33,7 +33,11 @@ router.post('/slack', (req, res) => {
   }
 
   // Use environment variable for redirect URI or construct from request
-  const redirectUri = process.env.SLACK_REDIRECT_URI || `${req.protocol}://${req.get('host')}/auth/slack/callback`;
+  // Force HTTPS in production
+  const protocol = process.env.NODE_ENV === 'production' ? 'https' : req.protocol;
+  const redirectUri = process.env.SLACK_REDIRECT_URI || `${protocol}://${req.get('host')}/auth/slack/callback`;
+  
+  console.log('Constructed redirect URI:', redirectUri);
 
   const state = generateState();
   
@@ -94,7 +98,11 @@ router.get('/slack/callback', async (req, res) => {
 
   try {
     // Exchange code for access token using dynamic credentials
-    const redirectUri = process.env.SLACK_REDIRECT_URI || `${req.protocol}://${req.get('host')}/auth/slack/callback`;
+    // Force HTTPS in production
+    const protocol = process.env.NODE_ENV === 'production' ? 'https' : req.protocol;
+    const redirectUri = process.env.SLACK_REDIRECT_URI || `${protocol}://${req.get('host')}/auth/slack/callback`;
+    
+    console.log('Using redirect URI for token exchange:', redirectUri);
     
     const tokenResponse = await axios.post(SLACK_TOKEN_URL, null, {
       params: {
