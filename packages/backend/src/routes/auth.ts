@@ -17,9 +17,16 @@ const SLACK_TOKEN_URL = 'https://slack.com/api/oauth.v2.access';
 
 // Start OAuth flow with dynamic credentials
 router.post('/slack', (req, res) => {
+  console.log('OAuth flow initiated with:', {
+    hasClientId: !!req.body.clientId,
+    hasClientSecret: !!req.body.clientSecret,
+    hasSigningSecret: !!req.body.signingSecret
+  });
+  
   const { clientId, clientSecret, signingSecret } = req.body;
   
   if (!clientId || !clientSecret) {
+    console.log('Missing credentials error');
     return res.status(400).json({ 
       error: 'Missing required Slack credentials. Please provide clientId and clientSecret.' 
     });
