@@ -16,13 +16,19 @@ router.post('/schedule', async (req, res) => {
     
     const { userId, channelId, channelName, message, scheduledTime } = req.body;
 
-    if (!userId || !channelId || !channelName || !message || !scheduledTime) {
-      console.log('Missing required fields:', { userId: !!userId, channelId: !!channelId, channelName: !!channelName, message: !!message, scheduledTime: !!scheduledTime });
+    if (!userId || !channelId || !channelName || !message || scheduledTime == null) {
+      console.log('Missing required fields:', { userId: !!userId, channelId: !!channelId, channelName: !!channelName, message: !!message, scheduledTime: scheduledTime });
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const scheduledTimestamp = new Date(scheduledTime).getTime();
-    console.log('Scheduled timestamp:', scheduledTimestamp, 'Current time:', Date.now());
+    // scheduledTime is now already a timestamp from frontend
+    const scheduledTimestamp = typeof scheduledTime === 'number' ? scheduledTime : new Date(scheduledTime).getTime();
+    
+    console.log('Received scheduled time:', scheduledTime);
+    console.log('Parsed timestamp:', scheduledTimestamp);
+    console.log('Current timestamp:', Date.now());
+    console.log('Scheduled date:', new Date(scheduledTimestamp).toISOString());
+    console.log('Current date:', new Date().toISOString());
     
     if (scheduledTimestamp <= Date.now()) {
       return res.status(400).json({ error: 'Scheduled time must be in the future' });

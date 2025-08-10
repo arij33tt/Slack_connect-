@@ -89,12 +89,23 @@ export const MessageForm: React.FC<MessageFormProps> = ({ userId }) => {
   const scheduleMessage = async () => {
     const selectedChannelObj = channels.find(ch => ch.id === selectedChannel);
     
+    // Convert datetime-local to UTC timestamp for consistent handling
+    const scheduledDate = new Date(scheduledTime);
+    const utcTimestamp = scheduledDate.getTime();
+    
+    console.log('Scheduling message:', {
+      localTime: scheduledTime,
+      parsedDate: scheduledDate.toISOString(),
+      utcTimestamp: utcTimestamp,
+      currentTime: Date.now()
+    });
+    
     const response = await api.post('/api/scheduled/schedule', {
       userId,
       channelId: selectedChannel,
       channelName: selectedChannelObj?.name || 'Unknown Channel',
       message,
-      scheduledTime
+      scheduledTime: utcTimestamp // Send as timestamp instead of string
     });
 
     if (response.data.success) {
@@ -180,6 +191,9 @@ export const MessageForm: React.FC<MessageFormProps> = ({ userId }) => {
               min={getMinDateTime()}
               required
             />
+            <small style={{ opacity: 0.7, fontSize: '0.85rem', display: 'block', marginTop: '0.25rem' }}>
+              Time is in your local timezone ({Intl.DateTimeFormat().resolvedOptions().timeZone})
+            </small>
           </div>
         )}
 
