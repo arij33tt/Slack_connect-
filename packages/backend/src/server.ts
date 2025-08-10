@@ -54,9 +54,11 @@ async function startServer() {
     await initDatabase();
     startScheduler();
     
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`Server running on port ${PORT}`);
       console.log(`Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
+      console.log(`Environment: ${process.env.NODE_ENV}`);
+      console.log(`Database path: ${process.env.DATABASE_PATH}`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);

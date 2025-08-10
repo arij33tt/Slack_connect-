@@ -12,11 +12,15 @@ COPY package*.json ./
 COPY packages/backend/package*.json ./packages/backend/
 COPY packages/frontend/package*.json ./packages/frontend/
 
-# Install all dependencies (including dev dependencies for build)
-RUN npm ci
+# Install all dependencies
+RUN npm install
 
 # Copy source code
 COPY . .
+
+# Create data directory
+RUN mkdir -p /app/data
+RUN mkdir -p /app/packages/backend/data
 
 # Set environment for production
 ENV NODE_ENV=production
@@ -26,22 +30,8 @@ ENV GENERATE_SOURCEMAP=false
 # Build both frontend and backend
 RUN npm run build
 
-# Clean up dev dependencies and cache
-RUN npm ci --only=production && npm cache clean --force
-
-# Remove build dependencies
-RUN apk del python3 make g++
-
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S slack -u 1001
-
-# Change ownership of the app directory
-RUN chown -R slack:nodejs /app
-USER slack
-
 # Expose port
-EXPOSE 3001
+EXPOSE $PORT
 
 # Start the application
 CMD ["npm", "start"]
