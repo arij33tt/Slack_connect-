@@ -6,11 +6,17 @@ import { dbAll, dbRun } from '../database/init';
 const CRON_SCHEDULE = '* * * * *';
 
 export function startScheduler(): void {
-  console.log('Starting message scheduler...');
+  console.log('Starting message scheduler with cron schedule:', CRON_SCHEDULE);
   
   cron.schedule(CRON_SCHEDULE, async () => {
+    console.log('Scheduler tick at:', new Date().toISOString());
     await processScheduledMessages();
+  }, {
+    scheduled: true,
+    timezone: "UTC"
   });
+  
+  console.log('Message scheduler started successfully');
 }
 
 async function processScheduledMessages(): Promise<void> {
@@ -33,6 +39,8 @@ async function processScheduledMessages(): Promise<void> {
     `, [currentTime]);
 
     if (messagesToSend.length === 0) {
+      // Uncomment for verbose logging
+      // console.log('No messages to send at', new Date().toISOString());
       return;
     }
 

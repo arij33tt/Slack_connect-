@@ -38,9 +38,17 @@ export const dbAll = (sql: string, params: any[] = []): Promise<DbAllResult> => 
 
 export async function initDatabase(): Promise<void> {
   return new Promise((resolve, reject) => {
-    const dbPath = process.env.NODE_ENV === 'production' 
-      ? '/tmp/slack_connect.db' 
-      : path.join(__dirname, '../../data/slack_connect.db');
+    // Use DATABASE_PATH environment variable if available, otherwise use defaults
+    let dbPath: string;
+    if (process.env.DATABASE_PATH) {
+      dbPath = process.env.DATABASE_PATH;
+    } else if (process.env.NODE_ENV === 'production') {
+      dbPath = '/tmp/slack_connect.db';
+    } else {
+      dbPath = path.join(__dirname, '../../data/slack_connect.db');
+    }
+    
+    console.log('Database path:', dbPath);
     
     // Ensure data directory exists in development
     if (process.env.NODE_ENV !== 'production') {

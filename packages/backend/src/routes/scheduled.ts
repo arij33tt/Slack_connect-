@@ -6,13 +6,23 @@ const router = express.Router();
 // Schedule a message
 router.post('/schedule', async (req, res) => {
   try {
+    console.log('Scheduling message request:', {
+      userId: req.body.userId,
+      channelId: req.body.channelId,
+      channelName: req.body.channelName,
+      hasMessage: !!req.body.message,
+      scheduledTime: req.body.scheduledTime
+    });
+    
     const { userId, channelId, channelName, message, scheduledTime } = req.body;
 
     if (!userId || !channelId || !channelName || !message || !scheduledTime) {
+      console.log('Missing required fields:', { userId: !!userId, channelId: !!channelId, channelName: !!channelName, message: !!message, scheduledTime: !!scheduledTime });
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
     const scheduledTimestamp = new Date(scheduledTime).getTime();
+    console.log('Scheduled timestamp:', scheduledTimestamp, 'Current time:', Date.now());
     
     if (scheduledTimestamp <= Date.now()) {
       return res.status(400).json({ error: 'Scheduled time must be in the future' });
