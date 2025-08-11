@@ -24,7 +24,6 @@ if not exist "packages\backend\.env" (
 ) else (
     echo ✅ .env file already exists
 )
-
 echo.
 echo 🎉 Setup complete!
 echo.
