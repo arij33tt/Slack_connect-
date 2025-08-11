@@ -70,7 +70,7 @@ export const AuthComponent: React.FC<AuthProps> = ({ onLogin }) => {
               📋 Enter Slack App Credentials
             </button>
             
-            <div style={{ marginTop: '1.5rem', padding: '1rem', background: '#f8f9fa', borderRadius: '8px', fontSize: '0.9rem' }}>
+            <div style={{ marginTop: '1.5rem', padding: '1rem', background: '#08090aff', borderRadius: '8px', fontSize: '0.9rem' }}>
               <p><strong>Don't have a Slack app yet?</strong></p>
               <ol style={{ textAlign: 'left', paddingLeft: '1rem', margin: '0.5rem 0' }}>
                 <li>Go to <a href="https://api.slack.com/apps" target="_blank" rel="noopener noreferrer">api.slack.com/apps</a></li>
