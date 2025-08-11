@@ -109,6 +109,12 @@ The application will be available at:
 - Cancel pending messages before they're sent
 - Track message status (Pending/Sent/Failed/Cancelled)
 
+## 🌟 Challenges and Learning 
+   - Connecting Slack Redirect url to the backend.
+   - Set up the Schedule message part.
+   - Learn how to deploy , Slack redirect url requires Https , but localhost runs on http , got to learn that deployment helps in this part.
+
+
 
 ---
 
