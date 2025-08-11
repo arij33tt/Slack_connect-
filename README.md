@@ -1,3 +1,7 @@
+:warning: 
+# The website may not load properly if you are using a Jio network. Please try using a Wi-Fi connection or an Airtel SIM for better access.
+
+
 # Slack Connect 🚀
 
 A full-stack application that enables users to connect their Slack workspace, send messages immediately, and schedule messages for future delivery. Built with TypeScript, Node.js, React, and SQLite.
